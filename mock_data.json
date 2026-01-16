@@ -1,0 +1,58 @@
+{
+  "users": {
+    "user_1": {
+      "id": "user_1",
+      "name": "Paakshik Badjatya",
+      "type": "individual",
+      "title": "Full Stack Developer",
+      "skills": ["React", "Python", "FastAPI", "Machine Learning"],
+      "password":"paakshikbadjatya",
+      "linked_accounts": {
+        "linkedin": "linkedin.com/in/paakshik",
+        "codeforces": "codeforces.com/profile/paakshik",
+        "github": "github.com/paakshik"
+      },
+      "avatar_url": "https://placehold.co/100x100/6366F1/FFFFFF?text=PB",
+      "status": "chat"
+    },
+    "user_2": {
+      "id": "user_2",
+      "name": "Jigyasha Sharma",
+      "type": "individual",
+      "title": "UI/UX Designer",
+      "password":"jigyashasharma",
+      "skills": ["Figma", "CSS", "React", "Prototyping"],
+      "avatar_url": "https://placehold.co/100x100/F59E0B/FFFFFF?text=JS",
+      "status": "chat"
+    }
+  },
+
+  "projects": {
+    "proj_1": {
+      "id": "proj_1",
+      "title": "Hackathon Dashboard",
+      "organization": "Paakshik Badjatya",
+      "owner_id": "user_1",
+      "description": "A real-time hackathon collaboration platform.",
+      "required_skills": ["React", "FastAPI", "MongoDB"],
+      "pay": "$2000",
+      "benifits": "Certificate + Internship",
+      "goal": "Build a real-time hackathon collaboration platform."
+    },
+    "proj_2": {
+      "id": "proj_2",
+      "title": "AI Research Portal",
+      "organization": "Jigyasha Sharma",
+      "owner_id": "user_2",
+      "description": "A collaborative AI research portal for students.",
+      "required_skills": ["Python", "TensorFlow", "Data Science"],
+      "pay": "$4000",
+      "benifits": "Research credit + certificate",
+      "goal": "Build a real-time hackathon collaboration platform."
+    }
+  },
+
+  "messages": {
+ 
+  }
+}

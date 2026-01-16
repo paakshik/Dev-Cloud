@@ -1,0 +1,46 @@
+CollabFinder API (Backend)
+
+This is the Python backend for the collaboration platform, built with FastAPI.
+
+How to Run This Project
+
+Place Files:
+Make sure all the backend files are in this backend directory.
+
+README.md
+
+requirements.txt
+
+main.py
+
+Create a Virtual Environment (Recommended):
+Open a terminal in this backend directory and run:
+
+# For macOS/Linux
+
+python3 -m venv venv
+source venv/bin/activate
+
+# For Windows
+
+python -m venv venv
+.\venv\Scripts\activate
+
+Install Dependencies:
+With your virtual environment active, run:
+
+pip install -r requirements.txt
+
+Start the Development Server:
+Run the server using uvicorn:
+
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+--reload: Automatically restarts the server when you change the code.
+
+--host 0.0.0.0: Makes the server accessible on your local network.
+
+--port 8000: Runs the server on port 8000.
+
+View the API Docs:
+Your server is now running! You can see the automatic API documentation by visiting http://localhost:8000/docs in your browser.
