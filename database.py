@@ -14,6 +14,11 @@ load_dotenv(Path(__file__).with_name(".env"))
 
 def _database_url(raw_url: str | None = None):
     url = (raw_url if raw_url is not None else os.getenv("DATABASE_URL", "")).strip()
+    # Accept values pasted as `DATABASE_URL=...` or wrapped in quotes from a dotenv snippet.
+    if url.startswith("DATABASE_URL="):
+        url = url[len("DATABASE_URL="):].strip()
+    if len(url) >= 2 and url[0] == url[-1] and url[0] in {'\"', "'"}:
+        url = url[1:-1].strip()
     if not url:
         raise RuntimeError(
             "DATABASE_URL is missing. Set it in the hosting environment or backend/.env."
@@ -35,7 +40,7 @@ def _database_url(raw_url: str | None = None):
 
 
 def _build_url_from_raw_credentials(url: str) -> str:
-    from urllib.parse import parse_qsl, unquote
+    from urllib.parse import unquote
     from sqlalchemy.engine import make_url
 
     scheme, separator, rest = url.partition("://")
@@ -50,7 +55,7 @@ def _build_url_from_raw_credentials(url: str) -> str:
     parsed = make_url(f"{scheme}://{host_and_path}")
     if not parsed.host or not parsed.database:
         raise ValueError("missing database host or database name")
-    params = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    params = dict(parsed.query)
     safe = URL.create(
         "postgresql+psycopg",
         username=unquote(username),

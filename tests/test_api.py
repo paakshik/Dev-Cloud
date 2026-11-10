@@ -45,6 +45,8 @@ class ApiTests(unittest.TestCase):
         cls.engine.dispose()
 
     def setUp(self):
+        import cache
+        cache._redis_disabled_until = 0.0
         with self.SessionTesting() as session:
             session.query(FeedbackRecord).delete()
             session.query(MessageRecord).delete()

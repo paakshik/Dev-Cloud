@@ -30,6 +30,9 @@ class FakeRedis:
 
 
 class CacheTests(unittest.TestCase):
+    def setUp(self):
+        cache._redis_disabled_until = 0.0
+
     def test_json_values_round_trip(self):
         fake = FakeRedis()
         with patch.object(cache, "_client", fake):
