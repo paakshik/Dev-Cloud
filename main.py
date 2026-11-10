@@ -37,8 +37,12 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
 ALLOWED_ORIGINS = [origin.strip().rstrip("/") for origin in os.getenv(
     "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
 ).split(",") if origin.strip()]
-if FRONTEND_URL not in ALLOWED_ORIGINS:
-    ALLOWED_ORIGINS.append(FRONTEND_URL)
+# Keep the production Vercel origin allowed even if Render's older env value omits it.
+ALLOWED_ORIGINS.extend([
+    FRONTEND_URL,
+    "https://dev-cloud-frontend-ltfv.vercel.app",
+])
+ALLOWED_ORIGINS = list(dict.fromkeys(ALLOWED_ORIGINS))
 
 app.add_middleware(
     SessionMiddleware,
