@@ -7,7 +7,8 @@ httpx
 pydantic
 SQLAlchemy>=2.0,<3.0
 psycopg[binary]>=3.1,<4.0
-passlib[bcrypt]>=1.7,<2.0
+passlib>=1.7,<2.0
+bcrypt==4.0.1
 pytest>=8.0,<10.0
 redis>=5.0,<7.0
 itsdangerous

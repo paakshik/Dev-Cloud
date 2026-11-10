@@ -5,25 +5,62 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from sqlalchemy import MetaData, create_engine
-from sqlalchemy.exc import OperationalError, TimeoutError as SQLAlchemyTimeoutError
+from sqlalchemy.engine import URL
+from sqlalchemy.exc import ArgumentError, OperationalError, TimeoutError as SQLAlchemyTimeoutError
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv(Path(__file__).with_name(".env"))
 
 
-def _database_url():
-    url = os.getenv("DATABASE_URL", "").strip()
+def _database_url(raw_url: str | None = None):
+    url = (raw_url if raw_url is not None else os.getenv("DATABASE_URL", "")).strip()
     if not url:
         raise RuntimeError(
-            "DATABASE_URL is missing. Add your Render PostgreSQL connection URL "
-            "to backend/.env."
+            "DATABASE_URL is missing. Set it in the hosting environment or backend/.env."
         )
-    # Render may provide the legacy postgres:// scheme; SQLAlchemy expects postgresql://.
+    # Normalize the legacy PostgreSQL scheme.
     if url.startswith("postgres://"):
         url = "postgresql+psycopg://" + url[len("postgres://"):]
     elif url.startswith("postgresql://"):
         url = "postgresql+psycopg://" + url[len("postgresql://"):]
-    return url
+    # Always parse the authority at its final @ separator, then let SQLAlchemy
+    # encode username/password. This tolerates passwords containing raw @ or /.
+    try:
+        return _build_url_from_raw_credentials(url)
+    except (ArgumentError, ValueError, TypeError) as parse_error:
+        raise RuntimeError(
+            "DATABASE_URL is malformed. Set a PostgreSQL URL with username, password, "
+            "host, and database; URL-encode special characters if needed."
+        ) from parse_error
+
+
+def _build_url_from_raw_credentials(url: str) -> str:
+    from urllib.parse import parse_qsl, unquote
+    from sqlalchemy.engine import make_url
+
+    scheme, separator, rest = url.partition("://")
+    if not separator or scheme not in {"postgresql+psycopg", "postgresql"}:
+        raise ValueError("unsupported database URL scheme")
+    userinfo, at, host_and_path = rest.rpartition("@")
+    if not at or not userinfo or not host_and_path:
+        raise ValueError("missing URL credentials or host")
+    username, colon, password = userinfo.partition(":")
+    if not colon or not username or not password:
+        raise ValueError("missing URL username or password")
+    parsed = make_url(f"{scheme}://{host_and_path}")
+    if not parsed.host or not parsed.database:
+        raise ValueError("missing database host or database name")
+    params = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    safe = URL.create(
+        "postgresql+psycopg",
+        username=unquote(username),
+        password=unquote(password),
+        host=parsed.host,
+        port=parsed.port,
+        database=parsed.database,
+        query=params,
+    )
+    return safe.render_as_string(hide_password=False)
 
 
 POOL_SIZE = max(1, int(os.getenv("DB_POOL_SIZE", "5")))
